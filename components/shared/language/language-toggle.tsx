@@ -2,7 +2,6 @@
 
 import { useLocale } from "next-intl";
 import { useTransition } from "react";
-import { Languages } from "lucide-react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
@@ -39,7 +38,6 @@ export function LanguageToggle() {
       disabled={isPending}
       aria-label="Toggle language"
     >
-      <Languages className="size-4" aria-hidden />
       <span>{LOCALE_LABELS[locale]}</span>
     </Button>
   );
