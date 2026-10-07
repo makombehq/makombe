@@ -1,5 +1,5 @@
 export { ReviewCard, ReviewCardSkeleton } from "./review-card";
 export { ReviewGrid, ReviewGridSkeleton } from "./review-grid";
 export { ReviewList } from "./review-list";
-export { ReviewSearch } from "./review-search";
+export { ReviewSearch, ReviewSearchableGrid } from "./review-search";
 export { ReviewRelated } from "./review-related";

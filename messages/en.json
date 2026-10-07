@@ -19,19 +19,31 @@
   },
   "News": {
     "title": "News",
-    "empty": "No news yet. Check back soon."
+    "empty": "No news yet. Check back soon.",
+    "search": "Search news",
+    "noResults": "No news matches your search.",
+    "related": "Related news"
   },
   "Reviews": {
     "title": "Reviews",
-    "empty": "No reviews yet. Check back soon."
+    "empty": "No reviews yet. Check back soon.",
+    "search": "Search reviews",
+    "noResults": "No reviews match your search.",
+    "related": "Related reviews"
   },
   "Events": {
     "title": "Events",
-    "empty": "No events yet. Check back soon."
+    "empty": "No events yet. Check back soon.",
+    "search": "Search events",
+    "noResults": "No events match your search.",
+    "related": "Related events"
   },
   "Blog": {
     "title": "Blog",
-    "empty": "No posts yet. Check back soon."
+    "empty": "No posts yet. Check back soon.",
+    "search": "Search blog",
+    "noResults": "No posts match your search.",
+    "related": "Related posts"
   },
   "Footer": {
     "rights": "All rights reserved.",

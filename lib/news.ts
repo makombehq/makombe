@@ -15,12 +15,32 @@ export type NewsArticle = {
   year: string;
   /** Directory name, e.g. "10-october". */
   month: string;
+  /** Short summary shown on cards and listings. */
+  description: string;
+  /** Author name. */
+  author: string;
+  /** ISO publish date (YYYY-MM-DD), if provided. */
+  date: string | null;
+  /** Estimated reading time in minutes (from the body). */
+  readingTime: number;
 };
 
 export type NewsArticleDetail = NewsArticle & {
   /** Rendered HTML body of the markdown document. */
   contentHtml: string;
 };
+
+const DEFAULT_AUTHOR = "Hrudu Shibu";
+
+// Rough reading time: ~200 words per minute, minimum 1.
+function readingTimeMinutes(body: string): number {
+  const words = body.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
+function str(value: unknown): string | null {
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
 
 // Derive a human-readable title from a slug as a fallback.
 function slugToTitle(slug: string): string {
@@ -110,6 +130,10 @@ export async function getNewsArticles(): Promise<NewsArticle[]> {
           title: resolveTitle(file.slug, data, content),
           year: file.year,
           month: file.month,
+          description: str(data.description) ?? "",
+          author: str(data.author) ?? DEFAULT_AUTHOR,
+          date: str(data.date),
+          readingTime: readingTimeMinutes(content),
         } satisfies NewsArticle,
       };
     })
@@ -141,6 +165,10 @@ export async function getNewsArticle(
     title: resolveTitle(file.slug, data, content),
     year: file.year,
     month: file.month,
+    description: str(data.description) ?? "",
+    author: str(data.author) ?? DEFAULT_AUTHOR,
+    date: str(data.date),
+    readingTime: readingTimeMinutes(content),
     contentHtml: processed.toString(),
   };
 }

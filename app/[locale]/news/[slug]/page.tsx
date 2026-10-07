@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { AppLayout } from "@/components/app/app-layout";
+import { NewsRelated } from "@/components/pages/news";
+import { getNewsArticle, getNewsArticles } from "@/lib/news";
 
-// Dynamic article routes render on demand (slug comes from the URL and there
-// is no static content source yet). Allow the segment to block rather than
-// requiring a prerendered shell under Cache Components.
+// Dynamic article routes render on demand (slug comes from the URL).
 export const instant = false;
 
 export default async function NewsArticlePage({
@@ -21,13 +21,38 @@ export default async function NewsArticlePage({
   // Enable static rendering
   setRequestLocale(locale);
 
+  const article = await getNewsArticle(slug);
+  if (!article) {
+    notFound();
+  }
+
+  const t = await getTranslations("News");
+
+  const all = await getNewsArticles();
+  const related = all.filter((a) => a.slug !== article.slug).slice(0, 4);
+
   return (
     <AppLayout>
-      <article className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6 sm:py-24">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground break-words sm:text-3xl lg:text-4xl">
-          {slug}
-        </h1>
-      </article>
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-12 px-6 py-16 sm:px-10 sm:py-24 lg:px-16">
+        <article className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+          <header className="flex flex-col gap-3">
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl">
+              {article.title}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {[article.date, article.author, `${article.readingTime} min read`]
+                .filter(Boolean)
+                .join("  ·  ")}
+            </p>
+          </header>
+          <div
+            className="prose prose-neutral max-w-none dark:prose-invert"
+            dangerouslySetInnerHTML={{ __html: article.contentHtml }}
+          />
+        </article>
+
+        <NewsRelated articles={related} heading={t("related")} />
+      </div>
     </AppLayout>
   );
 }
