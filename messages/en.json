@@ -18,16 +18,20 @@
     "blog": "Blog"
   },
   "News": {
-    "title": "News"
+    "title": "News",
+    "empty": "No news yet. Check back soon."
   },
   "Reviews": {
-    "title": "Reviews"
+    "title": "Reviews",
+    "empty": "No reviews yet. Check back soon."
   },
   "Events": {
-    "title": "Events"
+    "title": "Events",
+    "empty": "No events yet. Check back soon."
   },
   "Blog": {
-    "title": "Blog"
+    "title": "Blog",
+    "empty": "No posts yet. Check back soon."
   },
   "Footer": {
     "rights": "All rights reserved.",

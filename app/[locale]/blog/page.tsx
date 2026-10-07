@@ -3,6 +3,8 @@ import { hasLocale, useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { AppLayout } from "@/components/app/app-layout";
+import { BlogGrid } from "@/components/pages/blog";
+import { getBlogPosts } from "@/lib/blog";
 
 export default async function BlogPage({
   params,
@@ -16,14 +18,24 @@ export default async function BlogPage({
   // Enable static rendering
   setRequestLocale(locale);
 
+  const posts = await getBlogPosts();
+
   return (
     <AppLayout>
-      <BlogContent />
+      <BlogContent postCount={posts.length}>
+        <BlogGrid posts={posts} />
+      </BlogContent>
     </AppLayout>
   );
 }
 
-function BlogContent() {
+function BlogContent({
+  children,
+  postCount,
+}: {
+  children: React.ReactNode;
+  postCount: number;
+}) {
   const t = useTranslations("Blog");
 
   return (
@@ -31,6 +43,13 @@ function BlogContent() {
       <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
         {t("title")}
       </h1>
+      <div className="mt-8">
+        {postCount > 0 ? (
+          children
+        ) : (
+          <p className="text-sm text-muted-foreground">{t("empty")}</p>
+        )}
+      </div>
     </div>
   );
 }
