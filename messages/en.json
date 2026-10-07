@@ -11,6 +11,20 @@
   "Cta": {
     "explore": "Explore Makombe"
   },
+  "Nav": {
+    "news": "News",
+    "reviews": "Reviews",
+    "events": "Events"
+  },
+  "News": {
+    "title": "News"
+  },
+  "Reviews": {
+    "title": "Reviews"
+  },
+  "Events": {
+    "title": "Events"
+  },
   "Footer": {
     "rights": "All rights reserved.",
     "terms": "Terms",
