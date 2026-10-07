@@ -16,19 +16,19 @@ export function AppFooter() {
         <nav className="flex items-center gap-4">
           <Link
             href="/legal/terms"
-            className="transition-colors hover:text-primary"
+            className="underline underline-offset-4 transition-colors hover:text-primary"
           >
             {t("terms")}
           </Link>
           <Link
             href="/legal/cookies"
-            className="transition-colors hover:text-primary"
+            className="underline underline-offset-4 transition-colors hover:text-primary"
           >
             {t("cookies")}
           </Link>
           <Link
             href="/legal/privacy"
-            className="transition-colors hover:text-primary"
+            className="underline underline-offset-4 transition-colors hover:text-primary"
           >
             {t("privacy")}
           </Link>
