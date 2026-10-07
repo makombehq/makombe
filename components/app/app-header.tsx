@@ -55,35 +55,61 @@ export function AppHeader() {
           </span>
         </Link>
 
-        {/* Desktop / tablet inline nav */}
-        <nav className="hidden items-center gap-5 text-sm font-medium text-muted-foreground sm:flex">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="transition-colors hover:text-primary"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <div className="flex items-center gap-4 sm:gap-5">
+          {/* Desktop / tablet inline nav */}
+          <nav className="hidden items-center gap-5 text-sm font-medium text-muted-foreground sm:flex">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="transition-colors hover:text-primary"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
 
-        {/* Mobile menu toggle */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          className="sm:hidden"
-          aria-label="Menu"
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? (
-            <X className="size-5" aria-hidden />
-          ) : (
-            <Menu className="size-5" aria-hidden />
-          )}
-        </Button>
+          {/* GitHub repository link (theme-aware icon) */}
+          <a
+            href="https://github.com/makombehq/makombe"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub repository"
+            className="inline-flex items-center opacity-80 transition-opacity hover:opacity-100"
+          >
+            <Image
+              src="/icons/social/github/dark.png"
+              alt="GitHub"
+              width={20}
+              height={20}
+              className="size-5 dark:hidden"
+            />
+            <Image
+              src="/icons/social/github/light.png"
+              alt="GitHub"
+              width={20}
+              height={20}
+              className="hidden size-5 dark:block"
+            />
+          </a>
+
+          {/* Mobile menu toggle */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="sm:hidden"
+            aria-label="Menu"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? (
+              <X className="size-5" aria-hidden />
+            ) : (
+              <Menu className="size-5" aria-hidden />
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile dropdown nav */}
