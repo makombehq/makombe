@@ -15,12 +15,36 @@ export type Event = {
   year: string;
   /** Directory name, e.g. "10-october". */
   month: string;
+  /** Short summary shown on cards and listings. */
+  description: string;
+  /** Author name. */
+  author: string;
+  /** ISO start date (YYYY-MM-DD), if provided. */
+  startDate: string | null;
+  /** ISO end date (YYYY-MM-DD), if provided. */
+  endDate: string | null;
+  /** Location string, e.g. "Prague, Czechia". */
+  location: string | null;
+  /** Estimated reading time in minutes (from the body). */
+  readingTime: number;
 };
 
 export type EventDetail = Event & {
   /** Rendered HTML body of the markdown document. */
   contentHtml: string;
 };
+
+const DEFAULT_AUTHOR = "Hrudu Shibu";
+
+// Rough reading time: ~200 words per minute, minimum 1.
+function readingTimeMinutes(body: string): number {
+  const words = body.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
+function str(value: unknown): string | null {
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
 
 // Derive a human-readable title from a slug as a fallback.
 function slugToTitle(slug: string): string {
@@ -106,6 +130,12 @@ export async function getEvents(): Promise<Event[]> {
           title: resolveTitle(file.slug, data, content),
           year: file.year,
           month: file.month,
+          description: str(data.description) ?? "",
+          author: str(data.author) ?? DEFAULT_AUTHOR,
+          startDate: str(data.startDate),
+          endDate: str(data.endDate),
+          location: str(data.location),
+          readingTime: readingTimeMinutes(content),
         } satisfies Event,
       };
     })
@@ -136,6 +166,12 @@ export async function getEvent(slug: string): Promise<EventDetail | null> {
     title: resolveTitle(file.slug, data, content),
     year: file.year,
     month: file.month,
+    description: str(data.description) ?? "",
+    author: str(data.author) ?? DEFAULT_AUTHOR,
+    startDate: str(data.startDate),
+    endDate: str(data.endDate),
+    location: str(data.location),
+    readingTime: readingTimeMinutes(content),
     contentHtml: processed.toString(),
   };
 }
