@@ -9,7 +9,7 @@ export function AppFooter() {
 
   return (
     <footer className="w-full border-t border-black/[.08] bg-white dark:border-white/[.145] dark:bg-black">
-      <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 px-6 py-6 text-sm text-zinc-600 dark:text-zinc-400 sm:flex-row sm:justify-between">
+      <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 px-4 py-6 text-sm text-zinc-600 dark:text-zinc-400 sm:flex-row sm:justify-between sm:px-6">
         <p>
           &copy; {CURRENT_YEAR} makombe. {t("rights")}
         </p>

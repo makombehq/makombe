@@ -29,7 +29,7 @@ export function AppTopbar() {
 
   return (
     <header className="relative z-50 w-full border-b border-black/[.08] bg-white dark:border-white/[.145] dark:bg-black">
-      <div className="mx-auto flex h-8 w-full max-w-3xl items-center justify-end px-6">
+      <div className="mx-auto flex h-8 w-full max-w-3xl items-center justify-end px-4 sm:px-6">
         {/* Theme + language toggles: only one open at a time */}
         <div ref={containerRef} className="flex items-center gap-2">
           <ThemeToggle
