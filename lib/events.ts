@@ -56,7 +56,7 @@ async function listMarkdownFiles(): Promise<MarkdownFile[]> {
   let years: string[];
   try {
     years = (await fs.readdir(EVENTS_DIR, { withFileTypes: true }))
-      .filter((d) => d.isDirectory())
+      .filter((d) => d.isDirectory() && !d.name.startsWith("_"))
       .map((d) => d.name);
   } catch {
     return files;
@@ -65,13 +65,16 @@ async function listMarkdownFiles(): Promise<MarkdownFile[]> {
   for (const year of years) {
     const yearDir = path.join(EVENTS_DIR, year);
     const months = (await fs.readdir(yearDir, { withFileTypes: true }))
-      .filter((d) => d.isDirectory())
+      .filter((d) => d.isDirectory() && !d.name.startsWith("_"))
       .map((d) => d.name);
 
     for (const month of months) {
       const monthDir = path.join(yearDir, month);
+      // Skip template/draft files prefixed with "_" (e.g. _template.md).
       const entries = (await fs.readdir(monthDir, { withFileTypes: true }))
-        .filter((d) => d.isFile() && d.name.endsWith(".md"))
+        .filter(
+          (d) => d.isFile() && d.name.endsWith(".md") && !d.name.startsWith("_")
+        )
         .map((d) => d.name);
 
       for (const entry of entries) {
@@ -92,23 +95,30 @@ export async function getEvents(): Promise<Event[]> {
   "use cache";
   const files = await listMarkdownFiles();
 
-  const events = await Promise.all(
+  const parsed = await Promise.all(
     files.map(async (file) => {
       const raw = await fs.readFile(file.filePath, "utf8");
       const { data, content } = matter(raw);
       return {
-        slug: file.slug,
-        title: resolveTitle(file.slug, data, content),
-        year: file.year,
-        month: file.month,
-      } satisfies Event;
+        draft: data.draft === true,
+        event: {
+          slug: file.slug,
+          title: resolveTitle(file.slug, data, content),
+          year: file.year,
+          month: file.month,
+        } satisfies Event,
+      };
     })
   );
 
-  // Newest first by year then month directory name.
-  return events.sort((a, b) =>
-    b.year.localeCompare(a.year) || b.month.localeCompare(a.month)
-  );
+  // Drop drafts, then sort newest first by year then month directory name.
+  return parsed
+    .filter((p) => !p.draft)
+    .map((p) => p.event)
+    .sort(
+      (a, b) =>
+        b.year.localeCompare(a.year) || b.month.localeCompare(a.month)
+    );
 }
 
 export async function getEvent(slug: string): Promise<EventDetail | null> {
