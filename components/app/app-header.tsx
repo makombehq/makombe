@@ -16,6 +16,7 @@ export function AppHeader() {
     { href: "/news" as const, label: t("news") },
     { href: "/reviews" as const, label: t("reviews") },
     { href: "/events" as const, label: t("events") },
+    { href: "/blog" as const, label: t("blog") },
   ];
 
   // Close the mobile menu on outside click/touch.

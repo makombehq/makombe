@@ -14,7 +14,8 @@
   "Nav": {
     "news": "News",
     "reviews": "Reviews",
-    "events": "Events"
+    "events": "Events",
+    "blog": "Blog"
   },
   "News": {
     "title": "News"
@@ -24,6 +25,9 @@
   },
   "Events": {
     "title": "Events"
+  },
+  "Blog": {
+    "title": "Blog"
   },
   "Footer": {
     "rights": "All rights reserved.",
