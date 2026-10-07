@@ -7,9 +7,10 @@ export const routing = defineRouting({
   // The default locale used when no locale matches
   defaultLocale: "en",
 
-  // Always prefix the locale in the URL (e.g. /en, /ml).
-  // The root URL "/" is redirected to the default locale by the middleware.
-  localePrefix: "always",
+  // Only prefix non-default locales (e.g. /ml). The default locale (English)
+  // is served at the root without a prefix (e.g. / instead of /en), and
+  // "/en" is redirected to "/" by the proxy.
+  localePrefix: "as-needed",
 });
 
 export type Locale = (typeof routing.locales)[number];

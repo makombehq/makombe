@@ -3,5 +3,12 @@
     "title": "Welcome",
     "description": "To get started, edit the page.tsx file.",
     "getStarted": "Get started"
+  },
+  "Hero": {
+    "titleLine1": "The intelligence",
+    "titleLine2": "behind technology."
+  },
+  "Cta": {
+    "explore": "Explore Makombe"
   }
 }
