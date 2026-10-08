@@ -7,6 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuLabel,
@@ -60,11 +61,11 @@ export function NewsToolbar({
             <span>{SORT_LABELS[sort]}</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuLabel>Sort</DropdownMenuLabel>
             <DropdownMenuRadioGroup
               value={sort}
               onValueChange={(v) => onSortChange(v as SortOrder)}
             >
+              <DropdownMenuLabel>Sort</DropdownMenuLabel>
               <DropdownMenuRadioItem value="latest">
                 Latest
               </DropdownMenuRadioItem>
@@ -85,7 +86,9 @@ export function NewsToolbar({
             <span>Filter</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuLabel>Filter</DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Filter</DropdownMenuLabel>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             {FILTER_GROUPS.map((group) => (
               <DropdownMenuSub key={group}>
