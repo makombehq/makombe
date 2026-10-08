@@ -4,6 +4,12 @@ import * as React from "react";
 import { Search } from "lucide-react";
 import type { Review } from "@/lib/reviews";
 import { ReviewGrid } from "./review-grid";
+import { ReviewList } from "./review-list";
+import {
+  ReviewToolbar,
+  type SortOrder,
+  type ViewMode,
+} from "./review-toolbar";
 
 type ReviewSearchProps = {
   value?: string;
@@ -39,31 +45,56 @@ type ReviewSearchableGridProps = {
   emptyLabel: string;
 };
 
-// Client-side searchable list: filters reviews by title and description.
 export function ReviewSearchableGrid({
   reviews,
   searchPlaceholder,
   emptyLabel,
 }: ReviewSearchableGridProps) {
   const [query, setQuery] = React.useState("");
+  const [sort, setSort] = React.useState<SortOrder>("latest");
+  const [view, setView] = React.useState<ViewMode>("grid");
 
-  const filtered = React.useMemo(() => {
+  const visible = React.useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return reviews;
-    return reviews.filter((r) =>
-      [r.title, r.description].join(" ").toLowerCase().includes(q)
-    );
-  }, [reviews, query]);
+    const filtered = q
+      ? reviews.filter((r) =>
+          [r.title, r.description].join(" ").toLowerCase().includes(q)
+        )
+      : reviews.slice();
+
+    filtered.sort((a, b) => {
+      switch (sort) {
+        case "latest":
+          return (b.date ?? "").localeCompare(a.date ?? "");
+        case "oldest":
+          return (a.date ?? "").localeCompare(b.date ?? "");
+        case "az":
+          return a.title.localeCompare(b.title);
+        case "za":
+          return b.title.localeCompare(a.title);
+      }
+    });
+
+    return filtered;
+  }, [reviews, query, sort]);
 
   return (
     <div className="flex flex-col gap-6">
-      <ReviewSearch
-        value={query}
-        onChange={setQuery}
-        placeholder={searchPlaceholder}
+      <ReviewToolbar
+        query={query}
+        onQueryChange={setQuery}
+        sort={sort}
+        onSortChange={setSort}
+        view={view}
+        onViewChange={setView}
+        searchPlaceholder={searchPlaceholder}
       />
-      {filtered.length > 0 ? (
-        <ReviewGrid reviews={filtered} />
+      {visible.length > 0 ? (
+        view === "grid" ? (
+          <ReviewGrid reviews={visible} />
+        ) : (
+          <ReviewList reviews={visible} />
+        )
       ) : (
         <p className="text-sm text-muted-foreground">{emptyLabel}</p>
       )}

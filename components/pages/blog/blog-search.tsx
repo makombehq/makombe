@@ -4,6 +4,12 @@ import * as React from "react";
 import { Search } from "lucide-react";
 import type { BlogPost } from "@/lib/blog";
 import { BlogGrid } from "./blog-grid";
+import { BlogList } from "./blog-list";
+import {
+  BlogToolbar,
+  type SortOrder,
+  type ViewMode,
+} from "./blog-toolbar";
 
 type BlogSearchProps = {
   value?: string;
@@ -35,31 +41,56 @@ type BlogSearchableGridProps = {
   emptyLabel: string;
 };
 
-// Client-side searchable list: filters posts by title and description.
 export function BlogSearchableGrid({
   posts,
   searchPlaceholder,
   emptyLabel,
 }: BlogSearchableGridProps) {
   const [query, setQuery] = React.useState("");
+  const [sort, setSort] = React.useState<SortOrder>("latest");
+  const [view, setView] = React.useState<ViewMode>("grid");
 
-  const filtered = React.useMemo(() => {
+  const visible = React.useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return posts;
-    return posts.filter((p) =>
-      [p.title, p.description].join(" ").toLowerCase().includes(q)
-    );
-  }, [posts, query]);
+    const filtered = q
+      ? posts.filter((p) =>
+          [p.title, p.description].join(" ").toLowerCase().includes(q)
+        )
+      : posts.slice();
+
+    filtered.sort((a, b) => {
+      switch (sort) {
+        case "latest":
+          return (b.date ?? "").localeCompare(a.date ?? "");
+        case "oldest":
+          return (a.date ?? "").localeCompare(b.date ?? "");
+        case "az":
+          return a.title.localeCompare(b.title);
+        case "za":
+          return b.title.localeCompare(a.title);
+      }
+    });
+
+    return filtered;
+  }, [posts, query, sort]);
 
   return (
     <div className="flex flex-col gap-6">
-      <BlogSearch
-        value={query}
-        onChange={setQuery}
-        placeholder={searchPlaceholder}
+      <BlogToolbar
+        query={query}
+        onQueryChange={setQuery}
+        sort={sort}
+        onSortChange={setSort}
+        view={view}
+        onViewChange={setView}
+        searchPlaceholder={searchPlaceholder}
       />
-      {filtered.length > 0 ? (
-        <BlogGrid posts={filtered} />
+      {visible.length > 0 ? (
+        view === "grid" ? (
+          <BlogGrid posts={visible} />
+        ) : (
+          <BlogList posts={visible} />
+        )
       ) : (
         <p className="text-sm text-muted-foreground">{emptyLabel}</p>
       )}

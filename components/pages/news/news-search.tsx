@@ -4,6 +4,12 @@ import * as React from "react";
 import { Search } from "lucide-react";
 import type { NewsArticle } from "@/lib/news";
 import { NewsGrid } from "./news-grid";
+import { NewsList } from "./news-list";
+import {
+  NewsToolbar,
+  type SortOrder,
+  type ViewMode,
+} from "./news-toolbar";
 
 type NewsSearchProps = {
   value?: string;
@@ -35,31 +41,56 @@ type NewsSearchableGridProps = {
   emptyLabel: string;
 };
 
-// Client-side searchable list: filters articles by title and description.
 export function NewsSearchableGrid({
   articles,
   searchPlaceholder,
   emptyLabel,
 }: NewsSearchableGridProps) {
   const [query, setQuery] = React.useState("");
+  const [sort, setSort] = React.useState<SortOrder>("latest");
+  const [view, setView] = React.useState<ViewMode>("grid");
 
-  const filtered = React.useMemo(() => {
+  const visible = React.useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return articles;
-    return articles.filter((a) =>
-      [a.title, a.description].join(" ").toLowerCase().includes(q)
-    );
-  }, [articles, query]);
+    const filtered = q
+      ? articles.filter((a) =>
+          [a.title, a.description].join(" ").toLowerCase().includes(q)
+        )
+      : articles.slice();
+
+    filtered.sort((a, b) => {
+      switch (sort) {
+        case "latest":
+          return (b.date ?? "").localeCompare(a.date ?? "");
+        case "oldest":
+          return (a.date ?? "").localeCompare(b.date ?? "");
+        case "az":
+          return a.title.localeCompare(b.title);
+        case "za":
+          return b.title.localeCompare(a.title);
+      }
+    });
+
+    return filtered;
+  }, [articles, query, sort]);
 
   return (
     <div className="flex flex-col gap-6">
-      <NewsSearch
-        value={query}
-        onChange={setQuery}
-        placeholder={searchPlaceholder}
+      <NewsToolbar
+        query={query}
+        onQueryChange={setQuery}
+        sort={sort}
+        onSortChange={setSort}
+        view={view}
+        onViewChange={setView}
+        searchPlaceholder={searchPlaceholder}
       />
-      {filtered.length > 0 ? (
-        <NewsGrid articles={filtered} />
+      {visible.length > 0 ? (
+        view === "grid" ? (
+          <NewsGrid articles={visible} />
+        ) : (
+          <NewsList articles={visible} />
+        )
       ) : (
         <p className="text-sm text-muted-foreground">{emptyLabel}</p>
       )}
