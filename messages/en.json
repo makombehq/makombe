@@ -11,6 +11,10 @@
   "Cta": {
     "explore": "Explore Makombe"
   },
+  "Topbar": {
+    "feedback": "Feedback",
+    "support": "Support"
+  },
   "Nav": {
     "news": "News",
     "reviews": "Reviews",
