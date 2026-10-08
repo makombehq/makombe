@@ -1,0 +1,27 @@
+# makombe
+
+> makombe is the intelligence behind technology — a platform that brings together technology news, research, open-source knowledge, events, reviews, insights, and data in one place.
+
+makombe is a multilingual (English and Malayalam) web application. Content is organized into sections, each backed by Markdown files and rendered as localized, static pages. The default locale (English) is served at the root; Malayalam is served under the `/ml` prefix.
+
+## Sections
+
+- [News](https://github.com/makombehq/makombe): Technology news articles. Path: /news, article: /news/<slug>
+- [Reviews](https://github.com/makombehq/makombe): Product and technology reviews. Path: /reviews, review: /reviews/<slug>
+- [Events](https://github.com/makombehq/makombe): Technology conferences and events. Path: /events, event: /events/<slug>
+- [Blog](https://github.com/makombehq/makombe): Company, research, and product posts. Path: /blog, post: /blog/<slug>
+
+## Legal
+
+- Terms of Service: /legal/terms
+- Cookies Policy: /legal/cookies
+- Privacy Policy: /legal/privacy
+
+## Notes
+
+- Locales: English (default, at root) and Malayalam (under /ml).
+- Each section supports search, sort (Latest, Oldest, A–Z, Z–A), filtering, and grid/list views.
+- Source and discussions: https://github.com/makombehq/makombe
+- Feedback: https://github.com/makombehq/makombe/discussions/new/choose
+- Support / issues: https://github.com/makombehq/makombe/issues/new
+- Contact: legal@makombe.app
