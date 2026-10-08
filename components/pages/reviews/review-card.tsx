@@ -5,7 +5,6 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  CardContent,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -17,10 +16,10 @@ export function ReviewCard({ review }: ReviewCardProps) {
   const date = review.date ? formatDate(review.date) : null;
 
   return (
-    <Card className="h-full transition-colors hover:border-primary/40">
-      <Link href={`/reviews/${review.slug}`} className="flex h-full flex-col">
+    <Card className="h-full rounded-none border-0 border-b border-border bg-transparent pb-6 shadow-none ring-0 transition-colors">
+      <Link href={`/reviews/${review.slug}`} className="group flex h-full flex-col">
         <CardHeader>
-          <CardTitle className="line-clamp-2 min-h-[2.75rem]">
+          <CardTitle className="line-clamp-2 min-h-[2.75rem] underline decoration-border underline-offset-4 transition-colors group-hover:text-primary group-hover:decoration-primary">
             {review.title}
           </CardTitle>
           <p className="line-clamp-1 min-h-[1rem] text-xs text-muted-foreground">
@@ -30,11 +29,6 @@ export function ReviewCard({ review }: ReviewCardProps) {
             {review.description}
           </CardDescription>
         </CardHeader>
-        <CardContent className="mt-auto">
-          <p className="text-xs text-muted-foreground">
-            {review.author}  ·  {review.readingTime} min read
-          </p>
-        </CardContent>
       </Link>
     </Card>
   );
@@ -51,7 +45,7 @@ function formatDate(iso: string): string {
 
 export function ReviewCardSkeleton() {
   return (
-    <Card className="h-full">
+    <Card className="h-full rounded-none border-0 border-b border-border bg-transparent pb-6 shadow-none ring-0">
       <CardHeader className="gap-2">
         <Skeleton className="h-5 w-3/4" />
         <Skeleton className="h-4 w-1/3" />
