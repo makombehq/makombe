@@ -1,5 +1,5 @@
 // Data access for the Blog section.
-// Reads markdown files from content/blog/<year>/<month>/<slug>.md.
+// Reads markdown files from content/blog/<category>/<slug>.md.
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -12,9 +12,8 @@ const BLOG_DIR = path.join(process.cwd(), "content", "blog");
 export type BlogPost = {
   slug: string;
   title: string;
-  year: string;
-  /** Directory name, e.g. "10-october". */
-  month: string;
+  /** Category directory name, e.g. "company", "research", "product". */
+  category: string;
   /** Short summary shown on cards and listings. */
   description: string;
   /** Author name. */
@@ -67,48 +66,39 @@ function resolveTitle(
 }
 
 type MarkdownFile = {
-  year: string;
-  month: string;
+  category: string;
   slug: string;
   filePath: string;
 };
 
-// Walk content/blog/<year>/<month>/*.md and collect file descriptors.
+// Walk content/blog/<category>/*.md and collect file descriptors.
 async function listMarkdownFiles(): Promise<MarkdownFile[]> {
   const files: MarkdownFile[] = [];
 
-  let years: string[];
+  let categories: string[];
   try {
-    years = (await fs.readdir(BLOG_DIR, { withFileTypes: true }))
+    categories = (await fs.readdir(BLOG_DIR, { withFileTypes: true }))
       .filter((d) => d.isDirectory() && !d.name.startsWith("_"))
       .map((d) => d.name);
   } catch {
     return files;
   }
 
-  for (const year of years) {
-    const yearDir = path.join(BLOG_DIR, year);
-    const months = (await fs.readdir(yearDir, { withFileTypes: true }))
-      .filter((d) => d.isDirectory() && !d.name.startsWith("_"))
+  for (const category of categories) {
+    const categoryDir = path.join(BLOG_DIR, category);
+    // Skip template/draft files prefixed with "_" (e.g. _template.md).
+    const entries = (await fs.readdir(categoryDir, { withFileTypes: true }))
+      .filter(
+        (d) => d.isFile() && d.name.endsWith(".md") && !d.name.startsWith("_")
+      )
       .map((d) => d.name);
 
-    for (const month of months) {
-      const monthDir = path.join(yearDir, month);
-      // Skip template/draft files prefixed with "_" (e.g. _template.md).
-      const entries = (await fs.readdir(monthDir, { withFileTypes: true }))
-        .filter(
-          (d) => d.isFile() && d.name.endsWith(".md") && !d.name.startsWith("_")
-        )
-        .map((d) => d.name);
-
-      for (const entry of entries) {
-        files.push({
-          year,
-          month,
-          slug: entry.replace(/\.md$/, ""),
-          filePath: path.join(monthDir, entry),
-        });
-      }
+    for (const entry of entries) {
+      files.push({
+        category,
+        slug: entry.replace(/\.md$/, ""),
+        filePath: path.join(categoryDir, entry),
+      });
     }
   }
 
@@ -125,11 +115,11 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       const { data, content } = matter(raw);
       return {
         draft: data.draft === true,
+        date: str(data.date),
         post: {
           slug: file.slug,
           title: resolveTitle(file.slug, data, content),
-          year: file.year,
-          month: file.month,
+          category: file.category,
           description: str(data.description) ?? "",
           author: str(data.author) ?? DEFAULT_AUTHOR,
           date: str(data.date),
@@ -139,13 +129,16 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     })
   );
 
-  // Drop drafts, then sort newest first by year then month directory name.
+  // Drop drafts, then sort newest first by date (falling back to title).
   return parsed
     .filter((p) => !p.draft)
-    .map((p) => p.post)
-    .sort(
-      (a, b) => b.year.localeCompare(a.year) || b.month.localeCompare(a.month)
-    );
+    .sort((a, b) => {
+      if (a.date && b.date) return b.date.localeCompare(a.date);
+      if (a.date) return -1;
+      if (b.date) return 1;
+      return a.post.title.localeCompare(b.post.title);
+    })
+    .map((p) => p.post);
 }
 
 export async function getBlogPost(
@@ -163,8 +156,7 @@ export async function getBlogPost(
   return {
     slug: file.slug,
     title: resolveTitle(file.slug, data, content),
-    year: file.year,
-    month: file.month,
+    category: file.category,
     description: str(data.description) ?? "",
     author: str(data.author) ?? DEFAULT_AUTHOR,
     date: str(data.date),
