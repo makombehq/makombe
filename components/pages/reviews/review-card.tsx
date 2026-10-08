@@ -20,17 +20,21 @@ export function ReviewCard({ review }: ReviewCardProps) {
     <Card className="h-full transition-colors hover:border-primary/40">
       <Link href={`/reviews/${review.slug}`} className="flex h-full flex-col">
         <CardHeader>
-          <CardTitle className="line-clamp-2">{review.title}</CardTitle>
-          {date ? (
-            <p className="text-xs text-muted-foreground">{date}</p>
-          ) : null}
-          {review.description ? (
-            <CardDescription className="line-clamp-3">
-              {review.description}
-            </CardDescription>
-          ) : null}
+          <CardTitle className="line-clamp-2 min-h-[2.75rem]">
+            {review.title}
+          </CardTitle>
+          <p className="line-clamp-1 min-h-[1rem] text-xs text-muted-foreground">
+            {date}
+          </p>
+          <CardDescription className="line-clamp-3 min-h-[3.75rem]">
+            {review.description}
+          </CardDescription>
         </CardHeader>
-        <CardContent />
+        <CardContent className="mt-auto">
+          <p className="text-xs text-muted-foreground">
+            {review.author}  ·  {review.readingTime} min read
+          </p>
+        </CardContent>
       </Link>
     </Card>
   );

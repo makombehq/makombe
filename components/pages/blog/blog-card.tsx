@@ -20,17 +20,21 @@ export function BlogCard({ post }: BlogCardProps) {
     <Card className="h-full transition-colors hover:border-primary/40">
       <Link href={`/blog/${post.slug}`} className="flex h-full flex-col">
         <CardHeader>
-          <CardTitle className="line-clamp-2">{post.title}</CardTitle>
-          {date ? (
-            <p className="text-xs text-muted-foreground">{date}</p>
-          ) : null}
-          {post.description ? (
-            <CardDescription className="line-clamp-3">
-              {post.description}
-            </CardDescription>
-          ) : null}
+          <CardTitle className="line-clamp-2 min-h-[2.75rem]">
+            {post.title}
+          </CardTitle>
+          <p className="line-clamp-1 min-h-[1rem] text-xs text-muted-foreground">
+            {date}
+          </p>
+          <CardDescription className="line-clamp-3 min-h-[3.75rem]">
+            {post.description}
+          </CardDescription>
         </CardHeader>
-        <CardContent />
+        <CardContent className="mt-auto">
+          <p className="text-xs text-muted-foreground">
+            {post.author}  ·  {post.readingTime} min read
+          </p>
+        </CardContent>
       </Link>
     </Card>
   );

@@ -22,17 +22,21 @@ export function EventCard({ event }: EventCardProps) {
     <Card className="h-full transition-colors hover:border-primary/40">
       <Link href={`/events/${event.slug}`} className="flex h-full flex-col">
         <CardHeader>
-          <CardTitle className="line-clamp-2">{event.title}</CardTitle>
-          {meta ? (
-            <p className="text-xs text-muted-foreground">{meta}</p>
-          ) : null}
-          {event.description ? (
-            <CardDescription className="line-clamp-3">
-              {event.description}
-            </CardDescription>
-          ) : null}
+          <CardTitle className="line-clamp-2 min-h-[2.75rem]">
+            {event.title}
+          </CardTitle>
+          <p className="line-clamp-1 min-h-[1rem] text-xs text-muted-foreground">
+            {meta}
+          </p>
+          <CardDescription className="line-clamp-3 min-h-[3.75rem]">
+            {event.description}
+          </CardDescription>
         </CardHeader>
-        <CardContent />
+        <CardContent className="mt-auto">
+          <p className="text-xs text-muted-foreground">
+            {event.author}  ·  {event.readingTime} min read
+          </p>
+        </CardContent>
       </Link>
     </Card>
   );
