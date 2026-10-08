@@ -11,6 +11,11 @@
   "Cta": {
     "explore": "Explore Makombe"
   },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for doesn't exist or has been moved.",
+    "home": "Back to home"
+  },
   "Topbar": {
     "feedback": "Feedback",
     "support": "Support"
