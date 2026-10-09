@@ -1,13 +1,18 @@
 // Data access for the Reviews section.
-// Reads markdown files from content/reviews/<year>/<month>/<slug>.md.
+// Reads markdown from content/reviews/<year>/<month>/<slug>.<locale>.md.
 
-import fs from "node:fs/promises";
-import path from "node:path";
-import matter from "gray-matter";
-import { remark } from "remark";
-import html from "remark-html";
+import type { Locale } from "@/i18n/routing";
+import {
+  listContent,
+  getContent,
+  readingTimeMinutes,
+  resolveTitle,
+  renderMarkdown,
+  str,
+} from "./content";
 
-const REVIEWS_DIR = path.join(process.cwd(), "content", "reviews");
+const SECTION = "reviews";
+const DEFAULT_AUTHOR = "Hrudu Shibu";
 
 export type Review = {
   slug: string;
@@ -15,158 +20,55 @@ export type Review = {
   year: string;
   /** Directory name, e.g. "10-october". */
   month: string;
-  /** Short summary shown on cards and listings. */
   description: string;
-  /** Author name. */
   author: string;
-  /** ISO publish date (YYYY-MM-DD), if provided. */
   date: string | null;
-  /** Estimated reading time in minutes (from the body). */
   readingTime: number;
 };
 
 export type ReviewDetail = Review & {
-  /** Rendered HTML body of the markdown document. */
   contentHtml: string;
 };
 
-const DEFAULT_AUTHOR = "Hrudu Shibu";
-
-// Rough reading time: ~200 words per minute, minimum 1.
-function readingTimeMinutes(body: string): number {
-  const words = body.trim().split(/\s+/).filter(Boolean).length;
-  return Math.max(1, Math.round(words / 200));
-}
-
-function str(value: unknown): string | null {
-  return typeof value === "string" && value.trim() ? value.trim() : null;
-}
-
-// Derive a human-readable title from a slug as a fallback.
-function slugToTitle(slug: string): string {
-  return slug
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-// Extract a title: frontmatter `title`, else the first `# ` heading, else slug.
-function resolveTitle(
+function toReview(
   slug: string,
+  segments: string[],
   data: Record<string, unknown>,
   body: string
-): string {
-  if (typeof data.title === "string" && data.title.trim()) {
-    return data.title.trim();
-  }
-  const heading = body.match(/^#\s+(.+)$/m);
-  if (heading) {
-    return heading[1].trim();
-  }
-  return slugToTitle(slug);
+): Review {
+  return {
+    slug,
+    title: resolveTitle(slug, data, body),
+    year: segments[0] ?? "",
+    month: segments[1] ?? "",
+    description: str(data.description) ?? "",
+    author: str(data.author) ?? DEFAULT_AUTHOR,
+    date: str(data.date),
+    readingTime: readingTimeMinutes(body),
+  };
 }
 
-type MarkdownFile = {
-  year: string;
-  month: string;
-  slug: string;
-  filePath: string;
-};
-
-// Walk content/reviews/<year>/<month>/*.md and collect file descriptors.
-async function listMarkdownFiles(): Promise<MarkdownFile[]> {
-  const files: MarkdownFile[] = [];
-
-  let years: string[];
-  try {
-    years = (await fs.readdir(REVIEWS_DIR, { withFileTypes: true }))
-      .filter((d) => d.isDirectory() && !d.name.startsWith("_"))
-      .map((d) => d.name);
-  } catch {
-    return files;
-  }
-
-  for (const year of years) {
-    const yearDir = path.join(REVIEWS_DIR, year);
-    const months = (await fs.readdir(yearDir, { withFileTypes: true }))
-      .filter((d) => d.isDirectory() && !d.name.startsWith("_"))
-      .map((d) => d.name);
-
-    for (const month of months) {
-      const monthDir = path.join(yearDir, month);
-      // Skip template/draft files prefixed with "_" (e.g. _template.md).
-      const entries = (await fs.readdir(monthDir, { withFileTypes: true }))
-        .filter(
-          (d) => d.isFile() && d.name.endsWith(".md") && !d.name.startsWith("_")
-        )
-        .map((d) => d.name);
-
-      for (const entry of entries) {
-        files.push({
-          year,
-          month,
-          slug: entry.replace(/\.md$/, ""),
-          filePath: path.join(monthDir, entry),
-        });
-      }
-    }
-  }
-
-  return files;
-}
-
-export async function getReviews(): Promise<Review[]> {
+export async function getReviews(locale: Locale): Promise<Review[]> {
   "use cache";
-  const files = await listMarkdownFiles();
+  const entries = await listContent(SECTION, locale);
 
-  const parsed = await Promise.all(
-    files.map(async (file) => {
-      const raw = await fs.readFile(file.filePath, "utf8");
-      const { data, content } = matter(raw);
-      return {
-        draft: data.draft === true,
-        review: {
-          slug: file.slug,
-          title: resolveTitle(file.slug, data, content),
-          year: file.year,
-          month: file.month,
-          description: str(data.description) ?? "",
-          author: str(data.author) ?? DEFAULT_AUTHOR,
-          date: str(data.date),
-          readingTime: readingTimeMinutes(content),
-        } satisfies Review,
-      };
-    })
-  );
-
-  // Drop drafts, then sort newest first by year then month directory name.
-  return parsed
-    .filter((p) => !p.draft)
-    .map((p) => p.review)
+  return entries
+    .filter((e) => e.data.draft !== true)
+    .map((e) => toReview(e.slug, e.segments, e.data, e.body))
     .sort(
       (a, b) => b.year.localeCompare(a.year) || b.month.localeCompare(a.month)
     );
 }
 
-export async function getReview(slug: string): Promise<ReviewDetail | null> {
+export async function getReview(
+  slug: string,
+  locale: Locale
+): Promise<ReviewDetail | null> {
   "use cache";
-  const files = await listMarkdownFiles();
-  const file = files.find((f) => f.slug === slug);
-  if (!file) return null;
+  const entry = await getContent(SECTION, slug, locale);
+  if (!entry) return null;
 
-  const raw = await fs.readFile(file.filePath, "utf8");
-  const { data, content } = matter(raw);
-  const processed = await remark().use(html).process(content);
-
-  return {
-    slug: file.slug,
-    title: resolveTitle(file.slug, data, content),
-    year: file.year,
-    month: file.month,
-    description: str(data.description) ?? "",
-    author: str(data.author) ?? DEFAULT_AUTHOR,
-    date: str(data.date),
-    readingTime: readingTimeMinutes(content),
-    contentHtml: processed.toString(),
-  };
+  const review = toReview(entry.slug, entry.segments, entry.data, entry.body);
+  const contentHtml = await renderMarkdown(entry.body);
+  return { ...review, contentHtml };
 }

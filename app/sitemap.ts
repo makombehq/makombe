@@ -18,9 +18,11 @@ function localeUrl(locale: string, pathname: string): string {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Slugs are canonical and shared across locales; enumerate with the
+  // default locale. (events and blog don't take a locale yet.)
   const [news, reviews, events, posts] = await Promise.all([
-    getNewsArticles(),
-    getReviews(),
+    getNewsArticles(routing.defaultLocale),
+    getReviews(routing.defaultLocale),
     getEvents(),
     getBlogPosts(),
   ]);

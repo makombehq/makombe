@@ -1,10 +1,15 @@
 ---
-# Review template — copy this file into content/reviews/<year>/<month>/<slug>.md
+# Review template — copy into content/reviews/<year>/<month>/<slug>.<locale>.md
 # Files whose name starts with "_" (like this one) are ignored by the loader.
 #
-# <year>  = e.g. 2026
-# <month> = e.g. 10-october (numeric prefix keeps months ordered)
-# <slug>  = kebab-case, becomes the URL at /reviews/<slug>
+# <year>   = e.g. 2026
+# <month>  = e.g. 10-october (numeric prefix keeps months ordered)
+# <slug>   = kebab-case canonical slug, shared across locales, becomes the
+#            URL at /reviews/<slug> (and /ml/reviews/<slug>)
+# <locale> = en | ml. Create one file per translation:
+#              <slug>.en.md  (English)
+#              <slug>.ml.md  (Malayalam)
+#            A missing translation falls back to the default locale (en).
 
 # Display title. If omitted, the loader falls back to the first "# " heading,
 # then to a title derived from the slug.

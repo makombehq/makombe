@@ -21,14 +21,14 @@ export default async function ReviewArticlePage({
   // Enable static rendering
   setRequestLocale(locale);
 
-  const review = await getReview(slug);
+  const review = await getReview(slug, locale);
   if (!review) {
     notFound();
   }
 
   const t = await getTranslations("Reviews");
 
-  const all = await getReviews();
+  const all = await getReviews(locale);
   const related = all.filter((r) => r.slug !== review.slug).slice(0, 4);
 
   return (

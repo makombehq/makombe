@@ -18,7 +18,7 @@ export default async function NewsPage({
   // Enable static rendering
   setRequestLocale(locale);
 
-  const articles = await getNewsArticles();
+  const articles = await getNewsArticles(locale);
   const t = await getTranslations("News");
 
   return (

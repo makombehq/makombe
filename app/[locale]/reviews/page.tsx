@@ -18,7 +18,7 @@ export default async function ReviewsPage({
   // Enable static rendering
   setRequestLocale(locale);
 
-  const reviews = await getReviews();
+  const reviews = await getReviews(locale);
   const t = await getTranslations("Reviews");
 
   return (

@@ -21,14 +21,14 @@ export default async function NewsArticlePage({
   // Enable static rendering
   setRequestLocale(locale);
 
-  const article = await getNewsArticle(slug);
+  const article = await getNewsArticle(slug, locale);
   if (!article) {
     notFound();
   }
 
   const t = await getTranslations("News");
 
-  const all = await getNewsArticles();
+  const all = await getNewsArticles(locale);
   const related = all.filter((a) => a.slug !== article.slug).slice(0, 4);
 
   return (
